@@ -1,0 +1,217 @@
+package ru.maliutin.tasklist.web.security;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
+import ru.maliutin.tasklist.domain.exception.AccessDeniedException;
+import ru.maliutin.tasklist.domain.user.Role;
+import ru.maliutin.tasklist.domain.user.User;
+import ru.maliutin.tasklist.service.UserService;
+import ru.maliutin.tasklist.service.props.JwtProperties;
+import ru.maliutin.tasklist.web.dto.aut.JwtResponse;
+
+import java.security.Key;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Сервисный класс обеспечивающий работу с токенами.
+ * Их создание, проверку.
+ */
+@Service  // Аннотация Spring - отмечающая класс, как сервисный класс приложения.
+@RequiredArgsConstructor // Аннотация lombok - создающая в классе конструктор для полей.
+public class JwtTokenProvider {
+    /**
+     * Поле с данными токена полученными из application.yaml
+     */
+    private final JwtProperties jwtProperties;
+    /**+
+     * Поле с сервисом авторизации пользователя.
+     */
+    private final UserDetailsService userDetailsService;
+    /**
+     * Поле с сервисом для работы с БД объекта пользователя.
+     */
+    private final UserService userService;
+    /**
+     * Поле с секретным ключом токенов,
+     * заполняется в конструкторе из зависимостей в application.yaml
+     */
+    private Key key;
+
+    /**
+     * Заполнение поля ключа. В поле присваивается объект Keys
+     * в который вносится секретный ключ из application.yaml
+     * Используются библиотеки jjwt.
+     */
+    @PostConstruct  // Аннотация указывающая, что метод должен быть вызван после инициализации конструктора.
+    public void init(){
+        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+    }
+
+    /**
+     * Метод создания access (короткоживущего) токена.
+     * Короткоживущий токен используется для аутентификации и авторизации пользователя.
+     * @param userId идентификатор пользователя.
+     * @param username логин пользователя.
+     * @param roles роли пользователя.
+     * @return строку в access токеном.
+     */
+    public String createAccessToken(Long userId, String username, Set<Role> roles){
+        /*
+            Claims - объект хранящий информацию о пользователе в токене.
+                    Работает как Map и в него передаем id пользователя.
+            Jwts - фабричный класс используемый для создания экземпляров интерфейсов JWT
+         */
+        Claims claims = Jwts.claims().subject(username).build();
+        claims.put("id", userId);
+        claims.put("roles", resolveRoles(roles));
+        // Текущее время (время создания токена).
+        Date now = new Date();
+        // Время когда токен перестанет быть действительным (время создания + время жизни (маленькое) из зависимостей application.yaml).
+        Date validity = new Date(now.getTime() + jwtProperties.getAccess());
+        // Собираем и возвращаем токен
+        return Jwts.builder()
+                // Передаем в токен
+                // 1. Информацию о пользователе
+                .claims(claims)
+                // 2. Время создания токена
+                .issuedAt(now)
+                // 3. Время "смерти" токена
+                .expiration(validity)
+                // 4. Секретный ключ токена
+                .signWith(key)
+                // Собираем токен.
+                .compact();
+    }
+
+    /**
+     * Служебный метод преобразующий множество перечислений ролей в лист строк с именами ролей.
+     * @param roles множество ролей.
+     * @return список с именами ролей.
+     */
+    private List<String> resolveRoles(Set<Role> roles){
+        return roles.stream().map(Enum::name).toList();
+    }
+
+    /**
+     * Создание refresh (долгоживущего) токена.
+     *
+     * @param userId идентификатор пользователя.
+     * @param username логин пользователя.
+     * @return
+     */
+    public String createRefreshToken(Long userId, String username){
+        Claims claims = Jwts.claims().subject(username).build();
+        claims.put("id", userId);
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + jwtProperties.getRefresh());
+        return Jwts.builder()
+                .claims(claims)
+                .issuedAt(now)
+                .expiration(validity)
+                .signWith(key)
+                .compact();
+    }
+
+    /**
+     * Метод получающий refresh токен, производящий его валидацию,
+     * если валидация успешна, для пользователя обновляется пара токенов
+     * и отправляется обратно.
+     * @param refreshToken долгоживущий токен.
+     * @return jwt ответ с парой токенов.
+     */
+    public JwtResponse refreshUserToken(String refreshToken){
+        // Создаем новый объект Jwt ответа.
+        JwtResponse jwtResponse = new JwtResponse();
+        // Производим валидацию полученного долгоживущего токена
+        if (!validateToken(refreshToken)){
+            // В случае некорректной валидации выбрасываем собственное исключение.
+            throw new AccessDeniedException();
+        }
+        // Иначе получаем Id пользователя
+        Long userId = Long.parseLong(getId(refreshToken));
+        // Подгружаем пользователя из БД.
+        User user = userService.getById(userId);
+        // Заполняем поля объекта Jwt ответа
+        jwtResponse.setId(userId);
+        jwtResponse.setUsername(user.getUsername());
+        jwtResponse.setAccessToken(createAccessToken(userId, user.getUsername(), user.getRoles()));
+        jwtResponse.setRefreshToken(createRefreshToken(userId, user.getUsername()));
+        // Отправляем Jwt ответ.
+        return jwtResponse;
+    }
+
+    /**
+     * Метод производящий валидацию токенов. (Обрабатывает как access, так и refresh токены)
+     * @param token токен в строковом представлении.
+     * @return true при успешной валидации, иначе false.
+     */
+    public boolean validateToken(String token){
+        // Проводим преобразование полученной строки с токеном в объект токена.
+        Jws<Claims> claims = Jwts.parser().setSigningKey(key).build().parseSignedClaims(token);
+
+        /*  Получаем данные из преобразованного токена getPayload(), получаем метку времени жизни токена getExpiration(),
+            проверяем что она раньше чем текущее время. Возвращаем отрицание полученного результата,
+            если время жизни истекло вернем false, иначе вернем true.
+        */
+        return !claims.getPayload().getExpiration().before(new Date());
+    }
+
+    /**
+     * Метод получения Id пользователя из токена
+     * @param token токен в строковом представлении
+     * @return Id пользователя в строковом представлении
+     */
+    private String getId(String token){
+        // Проводим преобразование полученной строки с токеном в объект токена.
+        return Jwts.parser()
+                .setSigningKey(key)
+                .build()
+                .parseSignedClaims(token)
+                // Получаем полезные данные (тело) токена.
+                .getPayload()
+                // По ключу из тела достаем id.
+                .get("id")
+                // Полученный id в виде строки возвращаем.
+                .toString();
+    }
+
+    /**
+     * Метод прохождения пользователем аутентификации.
+     * @param token токен в строковом представлении.
+     * @return объект аутентификации.
+     */
+    public Authentication getAuthentication(String token){
+        // Используя служебный метод получаем логин пользователя
+        String username = getUsername(token);
+        // Используя userDetailsService загружаем пользователя из БД используя метод loadUserByUsername
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        // Возвращаем Spring Security учетные данные пользователя.
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    /**
+     * Метод получения логина пользователя из токена.
+     * @param token токен в строковом представлении.
+     * @return логин пользователя в строковом представлении.
+     */
+    private String getUsername(String token){
+        return Jwts.parser()
+                .setSigningKey(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("username")
+                .toString();
+    }
+}
