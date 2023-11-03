@@ -3,7 +3,7 @@ package ru.maliutin.tasklist.web.dto.aut;
 import lombok.Data;
 
 /**
- *
+ *  Класс JWT ответов при аутентификации.
  */
 @Data
 public class JwtResponse {
@@ -16,11 +16,11 @@ public class JwtResponse {
      */
     private String username;
     /**
-     * Поле с ... токеном.
+     * Поле с короткоживущим токеном.
      */
     private String accessToken;
     /**
-     * Поле с ... токеном.
+     * Поле с долгоживущим токеном.
      */
     private String refreshToken;
 }
