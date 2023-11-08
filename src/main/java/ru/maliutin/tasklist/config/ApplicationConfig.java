@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,7 +26,13 @@ import ru.maliutin.tasklist.web.security.JwtTokenProvider;
 
 @Configuration  // Аннотация Spring - отмечающая класс, как конфигурационный.
 @EnableWebSecurity  // Аннотация Spring Security - отмечающая класс, как конфигурационный для Spring Security.
-@RequiredArgsConstructor  // Аннотация lombok - предоставляющая классу конструкторы.
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))  // Аннотация lombok - предоставляющая классу конструкторы.
+/*
+    Благодаря @Lazy, эти аргументы будут созданы только при первом обращении к ним.
+    Это может быть полезно, если создание аргументов потребует затратных ресурсов
+    или если вы хотите отложить их инициализацию.
+    В данном случае используется для предотвращения циклической зависимости между компонентами Spring.
+ */
 public class ApplicationConfig {
 
     /**

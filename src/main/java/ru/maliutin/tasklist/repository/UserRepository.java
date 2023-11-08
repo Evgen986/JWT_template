@@ -21,7 +21,7 @@ public interface UserRepository {
      * @param username логин пользователя.
      * @return объект Optional, который как может содержать пользователя, так и нет.
      */
-    Optional<User> finByUsername(String username);
+    Optional<User> findByUsername(String username);
 
     /**
      * Обновление пользователя в БД.

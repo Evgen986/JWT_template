@@ -12,11 +12,11 @@ import ru.maliutin.tasklist.web.dto.aut.JwtResponse;
 import ru.maliutin.tasklist.web.security.JwtTokenProvider;
 
 /**
- * Класс реализующий интерфейс AuthService и содержащий бизнес-логику программы.
- * Осуществляет аутентификацию пользователя.
+ * Сервис аутентификации пользователей.
+ * Осуществляет ответ парой токенов в случае успешной аутентификации пользователя.
  */
 @Service  // Аннотация обозначающая класс как объект сервиса для Spring
-// Аннотация lombok - используется для автоматической генерации конструктора, исходя из аргументов полей класса, которые отмечены другой аннотацией Lombok, такой как @NonNull.
+// Аннотация Lombok - генерирует конструктор, который автоматически принимает аргументы для всех полей класса, помеченных как final
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
@@ -34,9 +34,9 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * Метод аутентификации пользователя.
+     * Метод Jwt ответа (токенами), при успешной аутентификации пользователя.
      * @param loginRequest запрос на аутентификацию.
-     * @return
+     * @return ответ токенами.
      */
     @Override
     public JwtResponse login(JwtRequest loginRequest) {

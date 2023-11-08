@@ -72,9 +72,11 @@ public class JwtTokenProvider {
                     Работает как Map и в него передаем id пользователя.
             Jwts - фабричный класс используемый для создания экземпляров интерфейсов JWT
          */
-        Claims claims = Jwts.claims().subject(username).build();
-        claims.put("id", userId);
-        claims.put("roles", resolveRoles(roles));
+        Claims claims = Jwts.claims()
+                .subject(username)
+                .add("id", userId)
+                .add("roles", resolveRoles(roles))
+                .build();
         // Текущее время (время создания токена).
         Date now = new Date();
         // Время когда токен перестанет быть действительным (время создания + время жизни (маленькое) из зависимостей application.yaml).
@@ -111,8 +113,7 @@ public class JwtTokenProvider {
      * @return
      */
     public String createRefreshToken(Long userId, String username){
-        Claims claims = Jwts.claims().subject(username).build();
-        claims.put("id", userId);
+        Claims claims = Jwts.claims().subject(username).add("id", userId).build();
         Date now = new Date();
         Date validity = new Date(now.getTime() + jwtProperties.getRefresh());
         return Jwts.builder()
@@ -211,7 +212,6 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .get("username")
-                .toString();
+                .getSubject();
     }
 }

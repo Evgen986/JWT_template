@@ -2,6 +2,7 @@ package ru.maliutin.tasklist;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Класс конфигурации приложения.
@@ -17,6 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
  */
 @SpringBootApplication
+@EnableTransactionManagement // Аннотация включающая поддержание транзакций
 public class TasklistApplication {
 	/**
 	 * Точка входа в программу.

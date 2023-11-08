@@ -12,6 +12,7 @@ import ru.maliutin.tasklist.service.UserService;
 import ru.maliutin.tasklist.web.dto.aut.JwtRequest;
 import ru.maliutin.tasklist.web.dto.aut.JwtResponse;
 import ru.maliutin.tasklist.web.dto.user.UserDto;
+import ru.maliutin.tasklist.web.dto.validation.OnCreate;
 import ru.maliutin.tasklist.web.mappers.UserMapper;
 
 /**
@@ -41,9 +42,9 @@ public class AuthController {
     private final UserMapper userMapper;
 
     /**
-     * Аутентификация пользователя
-     * @param loginRequest TODO заполнить параметры
-     * @return
+     * Аутентификация пользователя.
+     * @param loginRequest принимает запрос пользователя в виде jwt запроса (с токеном)
+     * @return jwt ответ с парой токенов.
      */
     @PostMapping("/login")
     public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest){
@@ -51,20 +52,21 @@ public class AuthController {
     }
 
     /**
-     * Регистрация пользователя
+     * Регистрация пользователя.
      * @param userDto объект передачи данных User
-     * @return
+     * @return объект пользователя.
      */
     @PostMapping("/register")
-    public UserDto register(@Validated(Object.class) @RequestBody UserDto userDto){
+    public UserDto register(@Validated(OnCreate.class) @RequestBody UserDto userDto){
         User user = userMapper.toEntity(userDto);
         User createdUser = userService.create(user);
         return userMapper.toDto(createdUser);
     }
 
     /**
-     * TODO Заполнить описание
-     * @param refreshToken
+     * TODO
+     * Метод обновления пары токенов.
+     * @param refreshToken токен для обновления
      * @return
      */
     @PostMapping("/refresh")
