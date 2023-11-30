@@ -1,13 +1,21 @@
 package ru.maliutin.tasklist.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.maliutin.tasklist.domain.exception.ResourceNotFoundException;
 import ru.maliutin.tasklist.domain.task.Status;
 import ru.maliutin.tasklist.domain.task.Task;
+import ru.maliutin.tasklist.domain.task.TaskImage;
+import ru.maliutin.tasklist.domain.user.User;
 import ru.maliutin.tasklist.repository.TaskRepository;
+import ru.maliutin.tasklist.repository.UserRepository;
+import ru.maliutin.tasklist.service.ImageService;
 import ru.maliutin.tasklist.service.TaskService;
+import ru.maliutin.tasklist.service.UserService;
 
 import java.util.List;
 /**
@@ -23,6 +31,10 @@ public class TaskServiceImpl implements TaskService {
      */
     private final TaskRepository taskRepository;
 
+    private final UserService userService;
+
+    private final ImageService imageService;
+
     /**
      * Получение задачи по идентификатору.
      * @param id идентификатор задачи.
@@ -30,6 +42,7 @@ public class TaskServiceImpl implements TaskService {
      * @return объект задачи.
      */
     @Override
+    @Cacheable(value = "TaskService::getById", key = "#id")
     public Task getById(long id) throws ResourceNotFoundException{
         return taskRepository
                 .findById(id)
@@ -53,11 +66,12 @@ public class TaskServiceImpl implements TaskService {
      */
     @Override
     @Transactional
+    @CachePut(value = "TaskService::getById", key = "#task.id")
     public Task update(Task task) {
         if (task.getStatus() == null){
             task.setStatus(Status.TODO);
         }
-        taskRepository.update(task);
+        taskRepository.save(task);
         return task;
     }
 
@@ -69,10 +83,12 @@ public class TaskServiceImpl implements TaskService {
      */
     @Override
     @Transactional
+    @Cacheable(value = "TaskService:getById", key = "#task.id")
     public Task create(Task task, long userId) {
+        User user = userService.getById(userId);
         task.setStatus(Status.TODO);
-        taskRepository.create(task);
-        taskRepository.assignToUserById(task.getId(), userId);
+        user.getTasks().add(task);
+        userService.update(user);
         return task;
     }
 
@@ -82,7 +98,18 @@ public class TaskServiceImpl implements TaskService {
      */
     @Override
     @Transactional
+    @CacheEvict(value = "TaskService::getById", key = "#id")
     public void delete(long id) {
-        taskRepository.delete(id);
+        taskRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "TaskService::getById", key = "#taskId")
+    public void uploadImage(Long taskId, TaskImage image) {
+        Task task = getById(taskId);
+        String fileName = imageService.upload(image);
+        task.getImages().add(fileName);
+        taskRepository.save(task);
     }
 }

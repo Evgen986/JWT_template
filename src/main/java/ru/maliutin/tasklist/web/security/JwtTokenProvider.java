@@ -19,6 +19,8 @@ import ru.maliutin.tasklist.service.props.JwtProperties;
 import ru.maliutin.tasklist.web.dto.aut.JwtResponse;
 
 import java.security.Key;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -77,19 +79,16 @@ public class JwtTokenProvider {
                 .add("id", userId)
                 .add("roles", resolveRoles(roles))
                 .build();
-        // Текущее время (время создания токена).
-        Date now = new Date();
-        // Время когда токен перестанет быть действительным (время создания + время жизни (маленькое) из зависимостей application.yaml).
-        Date validity = new Date(now.getTime() + jwtProperties.getAccess());
+
+        // Время когда токен перестанет быть действительным (текущее время + время жизни (маленькое (1)) из зависимостей application.yaml приведенное к часам).
+        Instant validity = Instant.now().plus(jwtProperties.getAccess(), ChronoUnit.HOURS);
         // Собираем и возвращаем токен
         return Jwts.builder()
                 // Передаем в токен
                 // 1. Информацию о пользователе
                 .claims(claims)
-                // 2. Время создания токена
-                .issuedAt(now)
                 // 3. Время "смерти" токена
-                .expiration(validity)
+                .expiration(Date.from(validity))
                 // 4. Секретный ключ токена
                 .signWith(key)
                 // Собираем токен.
@@ -114,12 +113,10 @@ public class JwtTokenProvider {
      */
     public String createRefreshToken(Long userId, String username){
         Claims claims = Jwts.claims().subject(username).add("id", userId).build();
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + jwtProperties.getRefresh());
+        Instant validity = Instant.now().plus(jwtProperties.getAccess(), ChronoUnit.DAYS);
         return Jwts.builder()
                 .claims(claims)
-                .issuedAt(now)
-                .expiration(validity)
+                .expiration(Date.from(validity))
                 .signWith(key)
                 .compact();
     }

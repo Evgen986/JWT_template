@@ -1,5 +1,8 @@
 package ru.maliutin.tasklist.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.maliutin.tasklist.domain.task.Task;
 
 import java.util.List;
@@ -8,44 +11,20 @@ import java.util.Optional;
 /**
  * Интерфейс для запросов к БД сущности Task.
  */
-public interface TaskRepository {
-    /**
-     * Поиск задачи по Id.
-     * @param id идентификатор задачи.
-     * @return объект Optional, который как может содержать задачу, так и нет.
-     */
-    Optional<Task> findById(long id);
+public interface TaskRepository extends JpaRepository<Task, Long> {
+
 
     /**
      * Получение всех задач для конкретного пользователя.
+     *
      * @param userId идентификатор пользователя.
      * @return лист задач.
      */
-    List<Task> findAllByUserId(long userId);
-
-    /**
-     * Связывает задачу с конкретным пользователем.
-     * @param taskId идентификатор задачи.
-     * @param userId идентификатор пользователя.
-     */
-    void assignToUserById(long taskId, long userId);
-
-    /**
-     * Обновление задачи в БД.
-     * @param task объект задачи.
-     */
-    void update(Task task);
-
-    /**
-     * Сохранение новой задачи.
-     * @param task объект задачи.
-     */
-    void create(Task task);
-
-    /**
-     * Удаление задачи из БД.
-     * @param id идентификатор задачи.
-     */
-    void delete(long id);
+    @Query(value = """
+            SELECT * FROM tasks t
+            JOIN users_tasks ut ON ut.task_id = t.id
+            WHERE ut.user_id = :userId
+            """, nativeQuery = true)
+    List<Task> findAllByUserId(@Param("userId") long userId);
 
 }

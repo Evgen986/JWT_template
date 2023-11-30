@@ -13,18 +13,6 @@ import ru.maliutin.tasklist.web.dto.user.UserDto;
     Указываем что класс является компонентом Spring и его можно вызывать используя @Autowired
  */
 @Mapper(componentModel = "spring")
-public interface UserMapper {
-    /**
-     * Преобразование модели объекта User в объект данных UserDto.
-     * @param user объект модели.
-     * @return объект данных.
-     */
-    UserDto toDto(User user);
+public interface UserMapper extends Mappable<User ,UserDto>{
 
-    /**
-     * Преобразование объекта данных UserDto в объект модели User.
-     * @param userDto объект данных.
-     * @return объект модели.
-     */
-    User toEntity(UserDto userDto);
 }

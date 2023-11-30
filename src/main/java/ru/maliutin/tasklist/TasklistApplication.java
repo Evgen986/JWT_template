@@ -2,6 +2,7 @@ package ru.maliutin.tasklist;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @SpringBootApplication
 @EnableTransactionManagement // Аннотация включающая поддержание транзакций
+@EnableCaching // Аннотация подключающая кеширование для запросов к БД
 public class TasklistApplication {
 	/**
 	 * Точка входа в программу.

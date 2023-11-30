@@ -1,6 +1,7 @@
 package ru.maliutin.tasklist.service;
 
 import ru.maliutin.tasklist.domain.task.Task;
+import ru.maliutin.tasklist.domain.task.TaskImage;
 
 import java.util.List;
 
@@ -42,4 +43,6 @@ public interface TaskService {
      * @param id идентификатор задачи.
      */
     void delete(long id);
+
+    void uploadImage(Long taskId, TaskImage taskImage);
 }

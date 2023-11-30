@@ -2,15 +2,14 @@ package ru.maliutin.tasklist.web.controller;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.maliutin.tasklist.domain.exception.AccessDeniedException;
-import ru.maliutin.tasklist.domain.exception.ExceptionBody;
-import ru.maliutin.tasklist.domain.exception.ResourceMappingException;
-import ru.maliutin.tasklist.domain.exception.ResourceNotFoundException;
+import ru.maliutin.tasklist.domain.exception.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -94,6 +93,29 @@ public class ControllerAdvice {
                         violation -> violation.getMessage()
                 )));
         return exceptionBody;
+    }
+
+    /**
+     * Обработка исключения при некорректной аутентификации пользователя.
+     * @param e исключение AuthenticationException.
+     * @return объект ExceptionBody.
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionBody handlerBadCredentials(AuthenticationException e){
+        e.printStackTrace();
+        return new ExceptionBody("Authentication failed");
+    }
+
+    /**
+     * Обработка исключения при ошибке загрузки изображения.
+     * @param e исключение ImageUploadException.
+     * @return объект ExceptionBody.
+     */
+    @ExceptionHandler(ImageUploadException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionBody handleImageUpload(ImageUploadException e){
+        return new ExceptionBody(e.getMessage());
     }
 
     /**

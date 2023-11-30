@@ -1,6 +1,10 @@
 package ru.maliutin.tasklist.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +40,7 @@ public class UserServiceImpl implements UserService {
      * @return объект пользователя.
      */
     @Override
+    @Cacheable(value = "UserService::getById", key = "#id")  // Добавляет данные в кеш
     public User getById(long id) throws ResourceNotFoundException{
         return userRepository
                 .findById(id)
@@ -49,6 +54,7 @@ public class UserServiceImpl implements UserService {
      * @return объект пользователя.
      */
     @Override
+    @Cacheable(value = "UserService::getByUsername", key = "#username") // Добавляет данные в кеш
     public User getByUsername(String username) throws ResourceNotFoundException{
         return userRepository
                 .findByUsername(username)
@@ -62,10 +68,14 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
+    @Caching(put = {  // Изменяет данные в кеше
+            @CachePut(value = "UserService::getById", key = "#user.id"),
+            @CachePut(value = "UserService::getByUsername", key = "#user.username")
+    })
     public User update(User user) {
         // Кодируем сырой пароль пользователя при сохранении в БД
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.update(user);
+        userRepository.save(user);
         return user;
     }
 
@@ -77,6 +87,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
+    @Caching(cacheable = {  // Изменяет данные в кеше
+            @Cacheable(value = "UserService::getById", key = "#user.id"),
+            @Cacheable(value = "UserService::getByUsername", key = "#user.username")
+    })
     public User create(User user) {
         // Проверка, что пользователя с таким логином не существует.
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
@@ -87,11 +101,10 @@ public class UserServiceImpl implements UserService {
             throw new IllegalStateException("Password end password confirmation do not match.");
         // Кодируем сырой пароль пользователя при сохранении в БД
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.create(user);
         //Задаем роль пользователя
         Set<Role> roles = Set.of(Role.ROLE_USER);
-        userRepository.insertUserRole(user.getId(), Role.ROLE_USER);
         user.setRoles(roles);
+        userRepository.save(user);
         return user;
     }
 
@@ -102,6 +115,7 @@ public class UserServiceImpl implements UserService {
      * @return true - если принадлежит, иначе false.
      */
     @Override
+    @Cacheable(value = "UserService::isTaskOwner", key = "#userId + '.' + #taskId") // Помещает данные в кеш
     public boolean isTaskOwner(Long userId, long taskId) {
         return userRepository.isTaskOwner(userId, taskId);
     }
@@ -111,7 +125,8 @@ public class UserServiceImpl implements UserService {
      * @param id идентификатор пользователя.
      */
     @Override
+    @CacheEvict(value = "UserService::getById", key = "#id") // Удаляет данные из кеша
     public void delete(long id) {
-        userRepository.delete(id);
+        userRepository.deleteById(id);
     }
 }

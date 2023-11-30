@@ -1,5 +1,7 @@
 package ru.maliutin.tasklist.web.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +29,7 @@ import ru.maliutin.tasklist.web.mappers.UserMapper;
 @RequiredArgsConstructor
 // Аннотация Spring - активирует валидацию для всех методов контроллера.
 @Validated
+@Tag(name = "Auth Controller", description = "Auth API") // Аннотация Swagger добавляющая в документацию название и описание контроллера.
 public class AuthController {
     /**
      * Поле сервиса аутентификации.
@@ -47,6 +50,7 @@ public class AuthController {
      * @return jwt ответ с парой токенов.
      */
     @PostMapping("/login")
+    @Operation(summary = "Authenticate user") // Аннотация Swagger добавляющая описание метода в документацию.
     public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest){
         return authService.login(loginRequest);
     }
@@ -57,6 +61,7 @@ public class AuthController {
      * @return объект пользователя.
      */
     @PostMapping("/register")
+    @Operation(summary = "Registration user") // Аннотация Swagger добавляющая описание метода в документацию.
     public UserDto register(@Validated(OnCreate.class) @RequestBody UserDto userDto){
         User user = userMapper.toEntity(userDto);
         User createdUser = userService.create(user);
@@ -69,6 +74,7 @@ public class AuthController {
      * @param refreshToken токен для обновления
      * @return
      */
+    @Operation(summary = "Refresh token") // Аннотация Swagger добавляющая описание метода в документацию.
     @PostMapping("/refresh")
     public JwtResponse refresh(@RequestBody String refreshToken){
         return authService.refresh(refreshToken);
