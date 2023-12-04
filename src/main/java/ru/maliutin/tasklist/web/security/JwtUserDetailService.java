@@ -28,6 +28,7 @@ public class JwtUserDetailService implements UserDetailsService {
      * пользователя по логину переданному в параметр метода.
      * Используя маппер преобразует полученный объект пользователя в тип
      * необходимый для Spring Security.
+     *
      * @param username логин пользователя.
      * @return преобразованный объект.
      * @throws UsernameNotFoundException генерируется в случае отсутствия пользователя в БД.

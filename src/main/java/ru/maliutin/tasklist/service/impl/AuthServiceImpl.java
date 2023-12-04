@@ -35,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * Метод Jwt ответа (токенами), при успешной аутентификации пользователя.
+     *
      * @param loginRequest запрос на аутентификацию.
      * @return ответ токенами.
      */
@@ -66,6 +67,7 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * Метод производящий обновление пары токенов.
+     *
      * @param refreshToken долгоживущий токен
      * @return ответ с парой токенов.
      */

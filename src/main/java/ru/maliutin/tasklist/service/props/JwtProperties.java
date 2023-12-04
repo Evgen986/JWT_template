@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component;
  */
 @Component // Аннотация Spring - отмечающая класс, как компонент приложения.
 @Data  // Аннотация lombok - добавляющая конструктор, геттеры, сеттеры и т.д.
-@ConfigurationProperties(prefix = "security.jwt")  // Аннотация указывающая откуда брать данные для полей класса: application.yaml -> security -> jwt (названия полей совпадают с ключами в файле)
+@ConfigurationProperties(prefix = "security.jwt")
+// Аннотация указывающая откуда брать данные для полей класса: application.yaml -> security -> jwt (названия полей совпадают с ключами в файле)
 public class JwtProperties {
     /**
      * Секретный ключ для подписи токена.

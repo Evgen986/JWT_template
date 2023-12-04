@@ -2,7 +2,6 @@ package ru.maliutin.tasklist.web.controller;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,55 +22,60 @@ public class ControllerAdvice {
 
     /**
      * Исключение при ненахождении данных в БД.
+     *
      * @param e исключение ResourceNotFoundException
      * @return объект ExceptionBody
      */
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ExceptionBody handleResourceNotFound(ResourceNotFoundException e){
+    public ExceptionBody handleResourceNotFound(ResourceNotFoundException e) {
         return new ExceptionBody(e.getMessage());
     }
 
     /**
      * Исключение при преобразовании объектов.
+     *
      * @param e исключение ResourceNotFoundException
      * @return объект ExceptionBody
      */
     @ExceptionHandler(ResourceMappingException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionBody handleResourceMapping(ResourceNotFoundException e){
+    public ExceptionBody handleResourceMapping(ResourceNotFoundException e) {
         return new ExceptionBody(e.getMessage());
     }
 
     /**
      * Исключение при несовпадении паролей или повторной регистрации пользователя.
-     * @param e
+     *
+     * @param e объект исключение IllegalStateException
      * @return объект ExceptionBody
      */
     @ExceptionHandler(IllegalStateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionBody handleIllegalState(IllegalStateException e){
+    public ExceptionBody handleIllegalState(IllegalStateException e) {
         return new ExceptionBody(e.getMessage());
     }
 
     /**
      * Исключение при ошибках аутентификации, неверном токене.
+     *
      * @return объект ExceptionBody
      */
     @ExceptionHandler({AccessDeniedException.class, org.springframework.security.access.AccessDeniedException.class})
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ExceptionBody handleAccessDenied(){
+    public ExceptionBody handleAccessDenied() {
         return new ExceptionBody("Access denied.");
     }
 
     /**
      * Исключение генерируемое при валидации данных.
+     *
      * @param e исключение MethodArgumentNotValidException.
      * @return объект ExceptionBody.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionBody handleMethodArgumentNotValid(MethodArgumentNotValidException e){
+    public ExceptionBody handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
         ExceptionBody exceptionBody = new ExceptionBody("Validation failed");
         List<FieldError> errors = e.getBindingResult().getFieldErrors();
         exceptionBody.setErrors(errors.stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
@@ -80,12 +84,13 @@ public class ControllerAdvice {
 
     /**
      * Исключение генерируемое при валидации данных.
+     *
      * @param e исключение ConstraintViolationException
      * @return объект ExceptionBody
      */
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionBody handleConstraintViolation(ConstraintViolationException e){
+    public ExceptionBody handleConstraintViolation(ConstraintViolationException e) {
         ExceptionBody exceptionBody = new ExceptionBody("Validation failed");
         exceptionBody.setErrors(e.getConstraintViolations()
                 .stream().collect(Collectors.toMap(
@@ -97,35 +102,38 @@ public class ControllerAdvice {
 
     /**
      * Обработка исключения при некорректной аутентификации пользователя.
+     *
      * @param e исключение AuthenticationException.
      * @return объект ExceptionBody.
      */
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionBody handlerBadCredentials(AuthenticationException e){
+    public ExceptionBody handlerBadCredentials(AuthenticationException e) {
         e.printStackTrace();
         return new ExceptionBody("Authentication failed");
     }
 
     /**
      * Обработка исключения при ошибке загрузки изображения.
+     *
      * @param e исключение ImageUploadException.
      * @return объект ExceptionBody.
      */
     @ExceptionHandler(ImageUploadException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionBody handleImageUpload(ImageUploadException e){
+    public ExceptionBody handleImageUpload(ImageUploadException e) {
         return new ExceptionBody(e.getMessage());
     }
 
     /**
      * Метод перехватывающий все оставшиеся не обработанные в данном классе исключения.
+     *
      * @param e общий класс исключений
      * @return объект обобщенного исключения.
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ExceptionBody handleException(Exception e){
+    public ExceptionBody handleException(Exception e) {
         e.printStackTrace();
         return new ExceptionBody("Internal error.");
     }

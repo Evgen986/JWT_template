@@ -19,7 +19,7 @@ public class CustomSecurityExpression {
     // Поле объекта сервиса объектов User
     private final UserService userService;
 
-    public boolean canAccessUser(Long id){
+    public boolean canAccessUser(Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         JwtEntity user = (JwtEntity) authentication.getPrincipal();
@@ -31,21 +31,22 @@ public class CustomSecurityExpression {
 
     /**
      * Служебный метод проверки присутствия у объекта аутентификации переданных ролей.
+     *
      * @param authentication объект аутентификации.
-     * @param roles коллекция ролей
+     * @param roles          коллекция ролей
      * @return true - если какая-либо из ролей коллекции присутствует у объекта аутентификации, иначе false.
      */
-    private boolean hasAnyRole(Authentication authentication, Role... roles){
-        for (Role role : roles){
+    private boolean hasAnyRole(Authentication authentication, Role... roles) {
+        for (Role role : roles) {
             SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.name());
-            if (authentication.getAuthorities().contains(authority)){
+            if (authentication.getAuthorities().contains(authority)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean canAccessTask(long taskId){
+    public boolean canAccessTask(long taskId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         JwtEntity user = (JwtEntity) authentication.getPrincipal();

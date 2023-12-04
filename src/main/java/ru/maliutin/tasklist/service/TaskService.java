@@ -11,6 +11,7 @@ import java.util.List;
 public interface TaskService {
     /**
      * Получение задачи по id.
+     *
      * @param id идентификатор задачи.
      * @return объект задачи.
      */
@@ -18,6 +19,7 @@ public interface TaskService {
 
     /**
      * Получение списка всех задач для конкретного пользователя.
+     *
      * @param userId идентификатор пользователя.
      * @return лист задач.
      */
@@ -25,6 +27,7 @@ public interface TaskService {
 
     /**
      * Обновление задачи.
+     *
      * @param task объект задачи.
      * @return обновленный объект задачи.
      */
@@ -32,14 +35,16 @@ public interface TaskService {
 
     /**
      * Создание задачи.
-     * @param task объект задачи.
-     * @param userId  идентификатор пользователя, которому принадлежит задача.
+     *
+     * @param task   объект задачи.
+     * @param userId идентификатор пользователя, которому принадлежит задача.
      * @return Созданный объект задачи.
      */
     Task create(Task task, long userId);
 
     /**
      * Удаление задачи.
+     *
      * @param id идентификатор задачи.
      */
     void delete(long id);

@@ -21,7 +21,8 @@ import java.util.Set;
  * Осуществляет запросы к репозиторию и взаимодействующий с моделью User.
  */
 @Service  // Аннотация обозначающая класс как объект сервиса для Spring
-@RequiredArgsConstructor  // Аннотация lombok - используется для автоматической генерации конструктора, исходя из аргументов полей класса
+@RequiredArgsConstructor
+// Аннотация lombok - используется для автоматической генерации конструктора, исходя из аргументов полей класса
 @Transactional(readOnly = true)  // Аннотация указывающая, что в классе производятся транзакции при обращении к БД
 public class UserServiceImpl implements UserService {
     /**
@@ -35,13 +36,14 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Получение пользователя по идентификатору.
+     *
      * @param id идентификатор пользователя.
-     * @throws ResourceNotFoundException пользователь не найден.
      * @return объект пользователя.
+     * @throws ResourceNotFoundException пользователь не найден.
      */
     @Override
     @Cacheable(value = "UserService::getById", key = "#id")  // Добавляет данные в кеш
-    public User getById(long id) throws ResourceNotFoundException{
+    public User getById(long id) throws ResourceNotFoundException {
         return userRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found."));
@@ -49,13 +51,14 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Получение пользователя по логину.
+     *
      * @param username логин пользователя.
-     * @throws ResourceNotFoundException пользователь не найден.
      * @return объект пользователя.
+     * @throws ResourceNotFoundException пользователь не найден.
      */
     @Override
     @Cacheable(value = "UserService::getByUsername", key = "#username") // Добавляет данные в кеш
-    public User getByUsername(String username) throws ResourceNotFoundException{
+    public User getByUsername(String username) throws ResourceNotFoundException {
         return userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found."));
@@ -63,6 +66,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Обновление пользователя
+     *
      * @param user объект пользователя.
      * @return обновленный объект пользователя.
      */
@@ -81,9 +85,10 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Создание пользователя.
+     *
      * @param user объект пользователя.
-     * @throws IllegalArgumentException пользователь с таким логином существует, пароли не совпадают.
      * @return созданный объект пользователя.
+     * @throws IllegalArgumentException пользователь с таким логином существует, пароли не совпадают.
      */
     @Override
     @Transactional
@@ -110,6 +115,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Проверка, принадлежит ли задача пользователю.
+     *
      * @param userId идентификатор пользователя.
      * @param taskId идентификатор задачи.
      * @return true - если принадлежит, иначе false.
@@ -122,6 +128,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Удаление пользователя.
+     *
      * @param id идентификатор пользователя.
      */
     @Override

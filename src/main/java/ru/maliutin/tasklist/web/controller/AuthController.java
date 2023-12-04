@@ -29,7 +29,8 @@ import ru.maliutin.tasklist.web.mappers.UserMapper;
 @RequiredArgsConstructor
 // Аннотация Spring - активирует валидацию для всех методов контроллера.
 @Validated
-@Tag(name = "Auth Controller", description = "Auth API") // Аннотация Swagger добавляющая в документацию название и описание контроллера.
+@Tag(name = "Auth Controller", description = "Auth API")
+// Аннотация Swagger добавляющая в документацию название и описание контроллера.
 public class AuthController {
     /**
      * Поле сервиса аутентификации.
@@ -46,23 +47,25 @@ public class AuthController {
 
     /**
      * Аутентификация пользователя.
+     *
      * @param loginRequest принимает запрос пользователя в виде jwt запроса (с токеном)
      * @return jwt ответ с парой токенов.
      */
     @PostMapping("/login")
     @Operation(summary = "Authenticate user") // Аннотация Swagger добавляющая описание метода в документацию.
-    public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest){
+    public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest) {
         return authService.login(loginRequest);
     }
 
     /**
      * Регистрация пользователя.
+     *
      * @param userDto объект передачи данных User
      * @return объект пользователя.
      */
     @PostMapping("/register")
     @Operation(summary = "Registration user") // Аннотация Swagger добавляющая описание метода в документацию.
-    public UserDto register(@Validated(OnCreate.class) @RequestBody UserDto userDto){
+    public UserDto register(@Validated(OnCreate.class) @RequestBody UserDto userDto) {
         User user = userMapper.toEntity(userDto);
         User createdUser = userService.create(user);
         return userMapper.toDto(createdUser);
@@ -71,12 +74,13 @@ public class AuthController {
     /**
      * TODO
      * Метод обновления пары токенов.
+     *
      * @param refreshToken токен для обновления
      * @return
      */
     @Operation(summary = "Refresh token") // Аннотация Swagger добавляющая описание метода в документацию.
     @PostMapping("/refresh")
-    public JwtResponse refresh(@RequestBody String refreshToken){
+    public JwtResponse refresh(@RequestBody String refreshToken) {
         return authService.refresh(refreshToken);
     }
 }

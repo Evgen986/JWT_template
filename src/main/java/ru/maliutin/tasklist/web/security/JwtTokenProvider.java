@@ -36,7 +36,8 @@ public class JwtTokenProvider {
      * Поле с данными токена полученными из application.yaml
      */
     private final JwtProperties jwtProperties;
-    /**+
+    /**
+     * +
      * Поле с сервисом авторизации пользователя.
      */
     private final UserDetailsService userDetailsService;
@@ -56,19 +57,20 @@ public class JwtTokenProvider {
      * Используются библиотеки jjwt.
      */
     @PostConstruct  // Аннотация указывающая, что метод должен быть вызван после инициализации конструктора.
-    public void init(){
+    public void init() {
         this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
     }
 
     /**
      * Метод создания access (короткоживущего) токена.
      * Короткоживущий токен используется для аутентификации и авторизации пользователя.
-     * @param userId идентификатор пользователя.
+     *
+     * @param userId   идентификатор пользователя.
      * @param username логин пользователя.
-     * @param roles роли пользователя.
+     * @param roles    роли пользователя.
      * @return строку в access токеном.
      */
-    public String createAccessToken(Long userId, String username, Set<Role> roles){
+    public String createAccessToken(Long userId, String username, Set<Role> roles) {
         /*
             Claims - объект хранящий информацию о пользователе в токене.
                     Работает как Map и в него передаем id пользователя.
@@ -97,21 +99,22 @@ public class JwtTokenProvider {
 
     /**
      * Служебный метод преобразующий множество перечислений ролей в лист строк с именами ролей.
+     *
      * @param roles множество ролей.
      * @return список с именами ролей.
      */
-    private List<String> resolveRoles(Set<Role> roles){
+    private List<String> resolveRoles(Set<Role> roles) {
         return roles.stream().map(Enum::name).toList();
     }
 
     /**
      * Создание refresh (долгоживущего) токена.
      *
-     * @param userId идентификатор пользователя.
+     * @param userId   идентификатор пользователя.
      * @param username логин пользователя.
      * @return
      */
-    public String createRefreshToken(Long userId, String username){
+    public String createRefreshToken(Long userId, String username) {
         Claims claims = Jwts.claims().subject(username).add("id", userId).build();
         Instant validity = Instant.now().plus(jwtProperties.getAccess(), ChronoUnit.DAYS);
         return Jwts.builder()
@@ -125,14 +128,15 @@ public class JwtTokenProvider {
      * Метод получающий refresh токен, производящий его валидацию,
      * если валидация успешна, для пользователя обновляется пара токенов
      * и отправляется обратно.
+     *
      * @param refreshToken долгоживущий токен.
      * @return jwt ответ с парой токенов.
      */
-    public JwtResponse refreshUserToken(String refreshToken){
+    public JwtResponse refreshUserToken(String refreshToken) {
         // Создаем новый объект Jwt ответа.
         JwtResponse jwtResponse = new JwtResponse();
         // Производим валидацию полученного долгоживущего токена
-        if (!validateToken(refreshToken)){
+        if (!validateToken(refreshToken)) {
             // В случае некорректной валидации выбрасываем собственное исключение.
             throw new AccessDeniedException();
         }
@@ -151,10 +155,11 @@ public class JwtTokenProvider {
 
     /**
      * Метод производящий валидацию токенов. (Обрабатывает как access, так и refresh токены)
+     *
      * @param token токен в строковом представлении.
      * @return true при успешной валидации, иначе false.
      */
-    public boolean validateToken(String token){
+    public boolean validateToken(String token) {
         // Проводим преобразование полученной строки с токеном в объект токена.
         Jws<Claims> claims = Jwts.parser().setSigningKey(key).build().parseSignedClaims(token);
 
@@ -167,10 +172,11 @@ public class JwtTokenProvider {
 
     /**
      * Метод получения Id пользователя из токена
+     *
      * @param token токен в строковом представлении
      * @return Id пользователя в строковом представлении
      */
-    private String getId(String token){
+    private String getId(String token) {
         // Проводим преобразование полученной строки с токеном в объект токена.
         return Jwts.parser()
                 .setSigningKey(key)
@@ -186,10 +192,11 @@ public class JwtTokenProvider {
 
     /**
      * Метод прохождения пользователем аутентификации.
+     *
      * @param token токен в строковом представлении.
      * @return объект аутентификации.
      */
-    public Authentication getAuthentication(String token){
+    public Authentication getAuthentication(String token) {
         // Используя служебный метод получаем логин пользователя
         String username = getUsername(token);
         // Используя userDetailsService загружаем пользователя из БД используя метод loadUserByUsername
@@ -200,10 +207,11 @@ public class JwtTokenProvider {
 
     /**
      * Метод получения логина пользователя из токена.
+     *
      * @param token токен в строковом представлении.
      * @return логин пользователя в строковом представлении.
      */
-    private String getUsername(String token){
+    private String getUsername(String token) {
         return Jwts.parser()
                 .setSigningKey(key)
                 .build()

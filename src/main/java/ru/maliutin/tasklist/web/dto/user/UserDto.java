@@ -5,13 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
-import ru.maliutin.tasklist.domain.task.Task;
-import ru.maliutin.tasklist.domain.user.Role;
 import ru.maliutin.tasklist.web.dto.validation.OnCreate;
 import ru.maliutin.tasklist.web.dto.validation.OnUpdate;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Класс служащий макетом для преобразования объектов модели User в UserDTO и обратно.
@@ -40,7 +35,8 @@ public class UserDto {
     @NotNull(message = "Имя не может быть пустым!", groups = {OnUpdate.class, OnCreate.class})
     // Проверка длины получаемого строкового значения.
     @Length(max = 255, message = "Имя должно быть менее 255 символов!", groups = {OnUpdate.class, OnCreate.class})
-    @Schema(description = "User name", example = "John Doe") // Аннотация Swagger добавляющая описание параметра в документации
+    @Schema(description = "User name", example = "John Doe")
+    // Аннотация Swagger добавляющая описание параметра в документации
     private String name;
 
     /**
@@ -49,7 +45,8 @@ public class UserDto {
     @NotNull(message = "Логин не может быть пустым!", groups = {OnUpdate.class, OnCreate.class})
     // Проверка длины получаемого строкового значения.
     @Length(max = 255, message = "Логин должен быть менее 255 символов!", groups = {OnUpdate.class, OnCreate.class})
-    @Schema(description = "User email", example = "johndoe@gmail.com") // Аннотация Swagger добавляющая описание параметра в документации
+    @Schema(description = "User email", example = "johndoe@gmail.com")
+    // Аннотация Swagger добавляющая описание параметра в документации
     private String username;
 
     /**
@@ -64,7 +61,8 @@ public class UserDto {
      */
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull(message = "Пароль не может быть пустым!", groups = {OnUpdate.class, OnCreate.class})
-    @Schema(description = "User crypted password", example = "$2a$10$eaL9RAsJeY95hERA/D6iUOMLfDzt7FcIqcf39ytbShEioVYm0KGLq") // Аннотация Swagger добавляющая описание параметра в документации
+    @Schema(description = "User crypted password", example = "$2a$10$eaL9RAsJeY95hERA/D6iUOMLfDzt7FcIqcf39ytbShEioVYm0KGLq")
+    // Аннотация Swagger добавляющая описание параметра в документации
     private String password;
 
     /**
@@ -72,7 +70,8 @@ public class UserDto {
      */
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull(message = "Подтверждение пароля не может быть пустым!", groups = {OnCreate.class})
-    @Schema(description = "User password confirmation", example = "$2a$10$eaL9RAsJeY95hERA/D6iUOMLfDzt7FcIqcf39ytbShEioVYm0KGLq") // Аннотация Swagger добавляющая описание параметра в документации
+    @Schema(description = "User password confirmation", example = "$2a$10$eaL9RAsJeY95hERA/D6iUOMLfDzt7FcIqcf39ytbShEioVYm0KGLq")
+    // Аннотация Swagger добавляющая описание параметра в документации
     private String passwordConfirmation;
 
 }

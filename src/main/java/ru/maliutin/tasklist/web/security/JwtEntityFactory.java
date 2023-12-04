@@ -19,16 +19,17 @@ public class JwtEntityFactory {
     /**
      * Метод преобразующий объект модели в JwtEntity,
      * т.е. тот объект, который будет проверять Spring Security.
+     *
      * @param user объект модели.
      * @return объект проверки для Spring Security.
      */
-    public static JwtEntity create(User user){
+    public static JwtEntity create(User user) {
         return new JwtEntity(
                 user.getId(),  // кладем в объект id
                 user.getUsername(),  // кладем в объект логин
                 user.getName(),  // кладем в объект имя
                 user.getPassword(),  // кладем в объект пароль
-                mapToGrantedAuthorities(new ArrayList<Role>(user.getRoles()))  // вызываем служеб. метод для преобразования ролей
+                mapToGrantedAuthorities(new ArrayList<>(user.getRoles()))  // вызываем служеб. метод для преобразования ролей
         );
     }
 
@@ -36,10 +37,11 @@ public class JwtEntityFactory {
      * Служебный метод, который преобразует роли пользователя
      * из ENUM в GrantedAuthority. GrantedAuthority - используется Spring Security для проверки
      * ролей пользователя и предоставления соответствующего уровня доступа.
+     *
      * @param roles роли пользователя.
      * @return коллекция GrantedAuthority пользователя.
      */
-    private static List<GrantedAuthority> mapToGrantedAuthorities(List<Role> roles){
+    private static List<GrantedAuthority> mapToGrantedAuthorities(List<Role> roles) {
         return roles.stream()
                 .map(Enum::name)
                 .map(SimpleGrantedAuthority::new)

@@ -49,10 +49,6 @@ public class ApplicationConfig {
      * Поле с объектом класса отвечающим за создание и проверку токенов.
      */
     private final JwtTokenProvider tokenProvider;
-    /**
-     * Поле с классом отвечающих за аутентификацию пользователей.
-     */
-    private final ApplicationContext applicationContext;
 
     private final MinioProperties minioProperties;
 
@@ -69,10 +65,11 @@ public class ApplicationConfig {
 
     /**
      * Бин конфигурации minio
+     *
      * @return
      */
     @Bean
-    public MinioClient minioClient(){
+    public MinioClient minioClient() {
         return MinioClient.builder()
                 .endpoint(minioProperties.getUrl())
                 .credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey())
@@ -81,10 +78,11 @@ public class ApplicationConfig {
 
     /**
      * Бин конфигурации Swagger
+     *
      * @return
      */
     @Bean
-    public OpenAPI openAPI(){
+    public OpenAPI openAPI() {
         return new OpenAPI().addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(
                         new Components()
@@ -100,15 +98,17 @@ public class ApplicationConfig {
 
     /**
      * Бин отвечающий за хэширование паролей при прохождении аутентификации.
+     *
      * @return
      */
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     /**
      * Бин отвечающий за аутентификацию пользователя.
+     *
      * @param configuration конфигурацию аутентификации.
      * @return менеджер аутентификации.
      * @throws Exception исключение???
@@ -120,6 +120,7 @@ public class ApplicationConfig {
 
     /**
      * Бин с настройками фильтров Spring Security.
+     *
      * @param httpSecurity настройку Spring Security.
      * @return
      */

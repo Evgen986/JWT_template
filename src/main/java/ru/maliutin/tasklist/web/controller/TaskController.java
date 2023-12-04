@@ -26,7 +26,8 @@ import ru.maliutin.tasklist.web.mappers.TaskMapper;
 @RequiredArgsConstructor
 // Аннотация Spring - активирует валидацию для всех методов контроллера.
 @Validated
-@Tag(name = "Task Controller", description = "Task API") // Аннотация Swagger добавляющая в документацию название и описание контроллера.
+@Tag(name = "Task Controller", description = "Task API")
+// Аннотация Swagger добавляющая в документацию название и описание контроллера.
 public class TaskController {
     /**
      * Поле интерфейса сервиса объектов задач (Task).
@@ -41,36 +42,39 @@ public class TaskController {
 
     /**
      * Получение задачи по id.
+     *
      * @param id идентификатор задачи
      * @return задачу в виде объекта передачи данных.
      */
     @GetMapping("/{id}")
     @Operation(summary = "Get TaskDTO by id") // Аннотация Swagger добавляющая описание метода в документацию.
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
-    public TaskDto getById(@PathVariable Long id){
+    public TaskDto getById(@PathVariable Long id) {
         return taskMapper.toDto(taskService.getById(id));
     }
 
     /**
      * Удаление задачи по id.
+     *
      * @param id идентификатор задачи.
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete task by id") // Аннотация Swagger добавляющая описание метода в документацию.
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
-    public void deleteById(@PathVariable Long id){
+    public void deleteById(@PathVariable Long id) {
         taskService.delete(id);
     }
 
     /**
      * Обновление задачи.
+     *
      * @param taskDto задача для обновления.
      * @return обновленную задачу.
      */
     @PutMapping()
     @Operation(summary = "Update task") // Аннотация Swagger добавляющая описание метода в документацию.
-    @PreAuthorize("@customSecurityExpression.canAccessUser(#dto.id)")
-    public TaskDto update(@Validated(OnUpdate.class) @RequestBody TaskDto taskDto){
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#taskDto.id)")
+    public TaskDto update(@Validated(OnUpdate.class) @RequestBody TaskDto taskDto) {
         Task task = taskMapper.toEntity(taskDto);
         Task updateTusk = taskService.update(task);
         return taskMapper.toDto(updateTusk);
@@ -81,7 +85,7 @@ public class TaskController {
     @PreAuthorize("@customSecurityExpression.canAccessTask(#id)")
     public void uploadImage(@PathVariable("id") Long id,
                             @Validated
-                            @ModelAttribute TaskImageDto imageDto){
+                            @ModelAttribute TaskImageDto imageDto) {
         TaskImage image = taskImageMapper.toEntity(imageDto);
         taskService.uploadImage(id, image);
     }

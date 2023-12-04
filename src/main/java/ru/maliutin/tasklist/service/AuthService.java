@@ -8,14 +8,12 @@ import ru.maliutin.tasklist.web.dto.aut.JwtResponse;
  */
 public interface AuthService {
     /**
-     *
      * @param loginRequest
      * @return
      */
     JwtResponse login(JwtRequest loginRequest);
 
     /**
-     *
      * @param refreshToken
      * @return
      */

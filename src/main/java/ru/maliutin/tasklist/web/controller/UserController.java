@@ -26,7 +26,8 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @Validated
-@Tag(name = "User Controller", description = "User API")  // Аннотация Swagger добавляющая в документацию название и описание контроллера.
+@Tag(name = "User Controller", description = "User API")
+// Аннотация Swagger добавляющая в документацию название и описание контроллера.
 
 public class UserController {
     /**
@@ -49,14 +50,15 @@ public class UserController {
 
     /**
      * Обновление пользователя.
+     *
      * @param userDto пользователь для обновления.
      * @return обновленный пользователь.
      */
     @PutMapping
     @Operation(summary = "Update user") // Аннотация Swagger добавляющая описание метода в документацию.
     // Аннотация проверяющая имеет ли аутентифицированный пользователь доступ к методу
-    @PreAuthorize("@customSecurityExpression.canAccessUser(#dto.id)")
-    public UserDto update(@Validated(OnUpdate.class) @RequestBody UserDto userDto){
+    @PreAuthorize("@customSecurityExpression.canAccessUser(#userDto.id)")
+    public UserDto update(@Validated(OnUpdate.class) @RequestBody UserDto userDto) {
         User user = userMapper.toEntity(userDto);
         User updatedUser = userService.update(user);
         return userMapper.toDto(updatedUser);
@@ -64,6 +66,7 @@ public class UserController {
 
     /**
      * Получение пользователя по id.
+     *
      * @param id идентификатор пользователя.
      * @return найденный пользователь.
      */
@@ -78,33 +81,37 @@ public class UserController {
 
     /**
      * Удаление пользователя.
+     *
      * @param id идентификатор пользователя.
      */
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete user by id") // Аннотация Swagger добавляющая описание метода в документацию.
     // Аннотация проверяющая имеет ли аутентифицированный пользователь доступ к методу
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
-    public void deleteById(@PathVariable Long id){
+    public void deleteById(@PathVariable Long id) {
         userService.delete(id);
     }
 
     /**
      * Получение всех задач конкретного пользователя.
+     *
      * @param id идентификатор пользователя.
      * @return список задач пользователя.
      */
     @GetMapping("/{id}/tasks")
-    @Operation(summary = "Get all user tasks by user id") // Аннотация Swagger добавляющая описание метода в документацию.
+    @Operation(summary = "Get all user tasks by user id")
+    // Аннотация Swagger добавляющая описание метода в документацию.
     // Аннотация проверяющая имеет ли аутентифицированный пользователь доступ к методу
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
-    public List<TaskDto> getTasksByUserId(@PathVariable Long id){
+    public List<TaskDto> getTasksByUserId(@PathVariable Long id) {
         List<Task> tasks = taskService.getAllByUserId(id);
         return taskMapper.toDto(tasks);
     }
 
     /**
      * Создание новой задачи.
-     * @param id идентификатор пользователя, которому принадлежит задача.
+     *
+     * @param id      идентификатор пользователя, которому принадлежит задача.
      * @param taskDto новая задача.
      * @return созданную задачу.
      */
@@ -112,7 +119,7 @@ public class UserController {
     @Operation(summary = "Add task to user") // Аннотация Swagger добавляющая описание метода в документацию.
     // Аннотация проверяющая имеет ли аутентифицированный пользователь доступ к методу
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
-    public TaskDto createTask(@PathVariable Long id, @Validated(OnCreate.class) @RequestBody TaskDto taskDto){
+    public TaskDto createTask(@PathVariable Long id, @Validated(OnCreate.class) @RequestBody TaskDto taskDto) {
         Task newTask = taskMapper.toEntity(taskDto);
         Task createdTask = taskService.create(newTask, id);
         return taskMapper.toDto(createdTask);

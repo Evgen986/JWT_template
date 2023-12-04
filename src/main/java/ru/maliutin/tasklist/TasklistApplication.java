@@ -22,12 +22,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement // Аннотация включающая поддержание транзакций
 @EnableCaching // Аннотация подключающая кеширование для запросов к БД
 public class TasklistApplication {
-	/**
-	 * Точка входа в программу.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(TasklistApplication.class, args);
-	}
+    /**
+     * Точка входа в программу.
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(TasklistApplication.class, args);
+    }
 
 }

@@ -23,6 +23,7 @@ public class JwtTokenFilter extends GenericFilterBean {
 
     /**
      * Метод работы фильтра. Проводит аутентификацию пользователя.
+     *
      * @param servletRequest
      * @param servletResponse
      * @param filterChain
@@ -37,21 +38,22 @@ public class JwtTokenFilter extends GenericFilterBean {
          */
         String bearerToken = ((HttpServletRequest) servletRequest).getHeader("Authorization");
         // Проверяем что бы полученный токен был не пустым и начинался с "Bearer " (так маркируются токены).
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")){
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             // Обрезаем начало строки с токеном убирая "Bearer "
             bearerToken = bearerToken.substring(7);
         }
         // Проверяем что бы полученный токен не был пустым и передаем его на валидацию
-        if (bearerToken != null && jwtTokenProvider.validateToken(bearerToken)){
-            try{
+        if (bearerToken != null && jwtTokenProvider.validateToken(bearerToken)) {
+            try {
                 // Получаем объект аутентификации передав в метод getAuthentication полученный токен
                 Authentication authentication = jwtTokenProvider.getAuthentication(bearerToken);
                 // Если объект аутентификации не пуст
-                if (authentication != null){
+                if (authentication != null) {
                     // Сообщаем Spring что пользователь прошел аутентификацию
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
-            } catch (ResourceNotFoundException ignored){}
+            } catch (ResourceNotFoundException ignored) {
+            }
         }
         filterChain.doFilter(servletRequest, servletResponse);
     }
