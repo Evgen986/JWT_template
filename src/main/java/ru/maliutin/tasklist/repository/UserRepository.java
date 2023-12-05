@@ -17,7 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Поиск пользователя по username (логину).
      *
      * @param username логин пользователя.
-     * @return объект Optional, который как может содержать пользователя, так и нет.
+     * @return объект Optional,
+     * который как может содержать пользователя, так и нет.
      */
     Optional<User> findByUsername(String username);
 
@@ -34,6 +35,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
                           WHERE user_id = :userId
                             AND task_id = :taskId)
             """, nativeQuery = true)
-    boolean isTaskOwner(@Param("userId") long userId, @Param("taskId") long taskId);
+    boolean isTaskOwner(
+            @Param("userId") long userId, @Param("taskId") long taskId);
 
 }

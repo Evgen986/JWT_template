@@ -12,7 +12,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "tasks")
-@Data  // Автоматически создает геттеры, сеттеры, конструкторы, hashcode, equals;
+// Автоматически создает геттеры,
+// сеттеры, конструкторы, hashcode, equals;
+@Data
 public class Task implements Serializable {
     /**
      * Id задачи.

@@ -6,7 +6,6 @@ import org.springframework.data.repository.query.Param;
 import ru.maliutin.tasklist.domain.task.Task;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Интерфейс для запросов к БД сущности Task.

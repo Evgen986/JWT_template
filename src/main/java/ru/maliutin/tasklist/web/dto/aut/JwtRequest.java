@@ -8,19 +8,21 @@ import lombok.Data;
  * Класс авторизации пользователя.
  */
 @Data
-@Schema(description = "Request for login") // Аннотация Swagger добавляющая описание схемы в документации
+// Аннотация Swagger добавляющая описание схемы в документации
+@Schema(description = "Request for login")
 public class JwtRequest {
     /**
      * Поле с логином пользователя.
      */
-    @NotNull(message = "Логин не может быть пусты!")  // Аннотация валидации - проверяющая, что поле не пустое.
+    // Аннотация валидации - проверяющая, что поле не пустое.
+    @NotNull(message = "Логин не может быть пусты!")
     @Schema(description = "email", example = "johndoe@gmail.com")
     private String username;
 
     /**
      * Поле с паролем пользователя.
      */
-    @NotNull(message = "Пароль не может быть пустым!")  // Аннотация валидации - проверяющая, что поле не пустое.
+    @NotNull(message = "Пароль не может быть пустым!")
     @Schema(description = "password", example = "12345")
     private String password;
 }

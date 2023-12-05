@@ -7,8 +7,9 @@ public class ImageUploadException extends RuntimeException {
     /**
      * Конструктор исключения.
      * Вызывает родительский конструктор класса RuntimeException.
+     * @param message сообщение об ошибке.
      */
-    public ImageUploadException(String message) {
+    public ImageUploadException(final String message) {
         super(message);
     }
 

@@ -13,10 +13,15 @@ import ru.maliutin.tasklist.web.security.JwtTokenProvider;
 
 /**
  * Сервис аутентификации пользователей.
- * Осуществляет ответ парой токенов в случае успешной аутентификации пользователя.
+ * Осуществляет ответ парой токенов
+ * в случае успешной аутентификации пользователя.
  */
-@Service  // Аннотация обозначающая класс как объект сервиса для Spring
-// Аннотация Lombok - генерирует конструктор, который автоматически принимает аргументы для всех полей класса, помеченных как final
+// Аннотация обозначающая класс как объект сервиса для Spring
+@Service
+/*  Аннотация Lombok - генерирует конструктор,
+    который автоматически принимает аргументы
+    для всех полей класса, помеченных как final
+ */
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
@@ -34,20 +39,25 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * Метод Jwt ответа (токенами), при успешной аутентификации пользователя.
+     * Метод Jwt ответа (токенами),
+     * при успешной аутентификации пользователя.
      *
      * @param loginRequest запрос на аутентификацию.
      * @return ответ токенами.
      */
     @Override
-    public JwtResponse login(JwtRequest loginRequest) {
+    public JwtResponse login(final JwtRequest loginRequest) {
         JwtResponse jwtResponse = new JwtResponse();
         /*
-            Таким образом происходит перенаправление Spring на собственный класс аутентификации
-            JwtUserDetailService в котором проводится аутентификация пользователя в методе loadUserByUserName()
+            Таким образом происходит перенаправление Spring
+            на собственный класс аутентификации JwtUserDetailService
+            в котором проводится аутентификация пользователя
+            в методе loadUserByUserName()
          */
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()));
         // Если аутентификация прошла успешно и не было выброшено исключений
         // Используя сервис получаем пользователя из БД
         User user = userService.getByUsername(loginRequest.getUsername());
@@ -58,10 +68,15 @@ public class AuthServiceImpl implements AuthService {
         jwtResponse.setUsername(user.getUsername());
         // Короткоживущий токен
         jwtResponse.setAccessToken(
-                jwtTokenProvider.createAccessToken(user.getId(), user.getUsername(), user.getRoles()));
+                jwtTokenProvider.createAccessToken(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getRoles()));
         // Долгоживущий токен
         jwtResponse.setRefreshToken(
-                jwtTokenProvider.createRefreshToken(user.getId(), user.getUsername()));
+                jwtTokenProvider.createRefreshToken(
+                        user.getId(),
+                        user.getUsername()));
         return jwtResponse;
     }
 
@@ -72,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
      * @return ответ с парой токенов.
      */
     @Override
-    public JwtResponse refresh(String refreshToken) {
+    public JwtResponse refresh(final String refreshToken) {
         return jwtTokenProvider.refreshUserToken(refreshToken);
     }
 }

@@ -8,14 +8,14 @@ import ru.maliutin.tasklist.web.dto.aut.JwtResponse;
  */
 public interface AuthService {
     /**
-     * @param loginRequest
-     * @return
+     * @param loginRequest запрос на аутентификацию.
+     * @return ответ токенами.
      */
     JwtResponse login(JwtRequest loginRequest);
 
     /**
-     * @param refreshToken
-     * @return
+     * @param refreshToken долгоживущий токен
+     * @return ответ с парой токенов.
      */
     JwtResponse refresh(String refreshToken);
 

@@ -6,11 +6,12 @@ package ru.maliutin.tasklist.domain.exception;
  */
 public class ResourceNotFoundException extends RuntimeException {
     /**
-     * Конструктор класса исключения, использует родительский конструктор RuntimeException.
+     * Конструктор класса исключения,
+     * использует родительский конструктор RuntimeException.
      *
      * @param message сообщение для пользователя.
      */
-    public ResourceNotFoundException(String message) {
+    public ResourceNotFoundException(final String message) {
         super(message);
     }
 }

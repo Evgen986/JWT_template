@@ -14,7 +14,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "users")
-@Data  // Автоматически создает геттеры, сеттеры, конструкторы, hashcode, equals;
+// Автоматически создает геттеры, сеттеры, конструкторы, hashcode, equals;
+@Data
 public class User implements Serializable {
     /**
      * Id пользователя.
@@ -60,5 +61,4 @@ public class User implements Serializable {
     @OneToMany
     @JoinColumn(name = "task_id")
     private List<Task> tasks;
-
 }

@@ -22,7 +22,9 @@ import ru.maliutin.tasklist.web.mappers.TaskMapper;
 @RestController
 // Аннотация Spring - адрес обрабатываемый контроллером.
 @RequestMapping("/api/v1/tasks")
-// Аннотация lombok - используется для автоматической генерации конструктора, исходя из аргументов полей класса, которые отмечены другой аннотацией Lombok, такой как @NonNull.
+// Аннотация lombok - используется для автоматической
+// генерации конструктора, исходя из аргументов полей класса,
+// которые отмечены другой аннотацией Lombok, такой как @NonNull.
 @RequiredArgsConstructor
 // Аннотация Spring - активирует валидацию для всех методов контроллера.
 @Validated
@@ -47,9 +49,10 @@ public class TaskController {
      * @return задачу в виде объекта передачи данных.
      */
     @GetMapping("/{id}")
-    @Operation(summary = "Get TaskDTO by id") // Аннотация Swagger добавляющая описание метода в документацию.
+    // Аннотация Swagger добавляющая описание метода в документацию.
+    @Operation(summary = "Get TaskDTO by id")
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
-    public TaskDto getById(@PathVariable Long id) {
+    public TaskDto getById(@PathVariable final Long id) {
         return taskMapper.toDto(taskService.getById(id));
     }
 
@@ -59,9 +62,10 @@ public class TaskController {
      * @param id идентификатор задачи.
      */
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete task by id") // Аннотация Swagger добавляющая описание метода в документацию.
+    // Аннотация Swagger добавляющая описание метода в документацию.
+    @Operation(summary = "Delete task by id")
     @PreAuthorize("@customSecurityExpression.canAccessUser(#id)")
-    public void deleteById(@PathVariable Long id) {
+    public void deleteById(@PathVariable final Long id) {
         taskService.delete(id);
     }
 
@@ -72,9 +76,12 @@ public class TaskController {
      * @return обновленную задачу.
      */
     @PutMapping()
-    @Operation(summary = "Update task") // Аннотация Swagger добавляющая описание метода в документацию.
+    // Аннотация Swagger добавляющая описание метода в документацию.
+    @Operation(summary = "Update task")
     @PreAuthorize("@customSecurityExpression.canAccessUser(#taskDto.id)")
-    public TaskDto update(@Validated(OnUpdate.class) @RequestBody TaskDto taskDto) {
+    public TaskDto update(
+            @Validated(OnUpdate.class)
+            @RequestBody final TaskDto taskDto) {
         Task task = taskMapper.toEntity(taskDto);
         Task updateTusk = taskService.update(task);
         return taskMapper.toDto(updateTusk);
@@ -83,11 +90,10 @@ public class TaskController {
     @PostMapping("/{id}/image")
     @Operation(summary = "Upload image task")
     @PreAuthorize("@customSecurityExpression.canAccessTask(#id)")
-    public void uploadImage(@PathVariable("id") Long id,
+    public void uploadImage(@PathVariable("id") final Long id,
                             @Validated
-                            @ModelAttribute TaskImageDto imageDto) {
+                            @ModelAttribute final TaskImageDto imageDto) {
         TaskImage image = taskImageMapper.toEntity(imageDto);
         taskService.uploadImage(id, image);
     }
 }
-

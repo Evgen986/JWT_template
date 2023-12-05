@@ -11,7 +11,8 @@ import java.util.Collection;
  * Класс используемый Spring Security для аутентификации пользователя.
  */
 @Data
-@AllArgsConstructor  // Аннотация lombok - предоставляет классу конструктор со всеми полями.
+// Аннотация lombok - предоставляет классу конструктор со всеми полями.
+@AllArgsConstructor
 public class JwtEntity implements UserDetails {
     /**
      * Идентификатор пользователя.

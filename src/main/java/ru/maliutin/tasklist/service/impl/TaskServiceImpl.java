@@ -22,10 +22,17 @@ import java.util.List;
  * Класс реализующий интерфейс TaskService и содержащий бизнес-логику программы.
  * Осуществляет запросы к репозиторию и взаимодействующий с моделью Task.
  */
-@Service  // Аннотация обозначающая класс как объект сервиса для Spring
+// Аннотация обозначающая класс как объект сервиса для Spring
+@Service
 @RequiredArgsConstructor
-// Аннотация lombok - используется для автоматической генерации конструктора, исходя из аргументов полей класса
-@Transactional(readOnly = true)  // Аннотация указывающая, что в классе производятся транзакции при обращении к БД
+/*
+    Аннотация lombok -
+    используется для автоматической генерации
+    конструктора, исходя из аргументов полей класса
+ */
+// Аннотация указывающая,
+// что в классе производятся транзакции при обращении к БД
+@Transactional(readOnly = true)
 public class TaskServiceImpl implements TaskService {
     /**
      * Поле с репозиторием объекта Task.
@@ -45,10 +52,11 @@ public class TaskServiceImpl implements TaskService {
      */
     @Override
     @Cacheable(value = "TaskService::getById", key = "#id")
-    public Task getById(long id) throws ResourceNotFoundException {
+    public Task getById(final long id) throws ResourceNotFoundException {
         return taskRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Task not found."));
     }
 
     /**
@@ -58,7 +66,7 @@ public class TaskServiceImpl implements TaskService {
      * @return список задач.
      */
     @Override
-    public List<Task> getAllByUserId(long userId) {
+    public List<Task> getAllByUserId(final long userId) {
         return taskRepository.findAllByUserId(userId);
     }
 
@@ -71,7 +79,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     @CachePut(value = "TaskService::getById", key = "#task.id")
-    public Task update(Task task) {
+    public Task update(final Task task) {
         if (task.getStatus() == null) {
             task.setStatus(Status.TODO);
         }
@@ -89,7 +97,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     @Cacheable(value = "TaskService:getById", key = "#task.id")
-    public Task create(Task task, long userId) {
+    public Task create(final Task task,
+                       final long userId) {
         User user = userService.getById(userId);
         task.setStatus(Status.TODO);
         user.getTasks().add(task);
@@ -105,14 +114,16 @@ public class TaskServiceImpl implements TaskService {
     @Override
     @Transactional
     @CacheEvict(value = "TaskService::getById", key = "#id")
-    public void delete(long id) {
+    public void delete(final long id) {
         taskRepository.deleteById(id);
     }
 
     @Override
     @Transactional
     @CacheEvict(value = "TaskService::getById", key = "#taskId")
-    public void uploadImage(Long taskId, TaskImage image) {
+    public void uploadImage(
+            final Long taskId,
+            final TaskImage image) {
         Task task = getById(taskId);
         String fileName = imageService.upload(image);
         task.getImages().add(fileName);
