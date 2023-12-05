@@ -8,7 +8,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.maliutin.tasklist.domain.exception.*;
+import ru.maliutin.tasklist.domain.exception.AccessDeniedException;
+import ru.maliutin.tasklist.domain.exception.ExceptionBody;
+import ru.maliutin.tasklist.domain.exception.ResourceMappingException;
+import ru.maliutin.tasklist.domain.exception.ResourceNotFoundException;
+import ru.maliutin.tasklist.domain.exception.ImageUploadException;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
