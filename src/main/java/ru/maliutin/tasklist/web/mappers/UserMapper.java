@@ -10,9 +10,10 @@ import ru.maliutin.tasklist.web.dto.user.UserDto;
 
 /*
     Аннотация обозначающая, что класс осуществляет преобразование объектов.
-    Указываем что класс является компонентом Spring и его можно вызывать используя @Autowired
+    Указываем что класс является компонентом Spring
+    и его можно вызывать используя @Autowired
  */
 @Mapper(componentModel = "spring")
-public interface UserMapper extends Mappable<User ,UserDto>{
+public interface UserMapper extends Mappable<User, UserDto> {
 
 }

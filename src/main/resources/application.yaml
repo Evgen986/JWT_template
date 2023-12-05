@@ -18,7 +18,7 @@ spring:
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
-#      data-locations: classpath:demo_data.sql
+  #      data-locations: classpath:demo_data.sql
   # Конфигурация liquibase (позволяет создать таблицы в указанной схеме БД из SQL скриптов)
   liquibase:
     change-log: classpath:liquibase/db.changelog.yaml

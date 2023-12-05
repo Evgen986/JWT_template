@@ -7,7 +7,6 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -33,63 +32,71 @@ import ru.maliutin.tasklist.web.security.JwtTokenProvider;
  * Класс конфигурации Spring Security.
  */
 
-@Configuration  // Аннотация Spring - отмечающая класс, как конфигурационный.
-@EnableWebSecurity  // Аннотация Spring Security - отмечающая класс, как конфигурационный для Spring Security.
-@RequiredArgsConstructor(onConstructor = @__(@Lazy))  // Аннотация lombok - предоставляющая классу конструкторы.
+// Аннотация Spring - отмечающая класс, как конфигурационный.
+@Configuration
+
 /*
-    Благодаря @Lazy, эти аргументы будут созданы только при первом обращении к ним.
-    Это может быть полезно, если создание аргументов потребует затратных ресурсов
-    или если вы хотите отложить их инициализацию.
-    В данном случае используется для предотвращения циклической зависимости между компонентами Spring.
+   Аннотация Spring Security - отмечающая класс,
+   как конфигурационный для Spring Security.
  */
-@EnableMethodSecurity  // Аннотация Spring включающая на уровне приложения проверку прав доступа в контроллерах.
+@EnableWebSecurity
+// Аннотация lombok - предоставляющая классу конструкторы.
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
+/*
+    Благодаря @Lazy, эти аргументы будут созданы
+    только при первом обращении к ним.
+    Это может быть полезно, если создание аргументов
+    потребует затратных ресурсов
+    или если вы хотите отложить их инициализацию.
+    В данном случае используется для предотвращения циклической зависимости
+    между компонентами Spring.
+ */
+/*
+    Аннотация Spring включающая на уровне приложения
+    проверку прав доступа в контроллерах.
+ */
+@EnableMethodSecurity
 public class ApplicationConfig {
 
     /**
      * Поле с объектом класса отвечающим за создание и проверку токенов.
      */
     private final JwtTokenProvider tokenProvider;
-    /**
-     * Поле с классом отвечающих за аутентификацию пользователей.
-     */
-    private final ApplicationContext applicationContext;
 
     private final MinioProperties minioProperties;
 
-//    /**
-//     * Бин для ВТОРОГО способа проверки доступа пользователя к данных на сервере.
-//     * @return
-//     */
-//    @Bean
-//    public MethodSecurityExpressionHandler expressionHandler(){
-//        DefaultMethodSecurityExpressionHandler expressionHandler = new CustomSecurityExceptionHandler();
-//        expressionHandler.setApplicationContext(applicationContext);
-//        return expressionHandler;
-//    }
-
     /**
-     * Бин конфигурации minio
-     * @return
+     * Бин конфигурации minio.
+     *
+     * @return возвращает клиент Minio.
      */
     @Bean
-    public MinioClient minioClient(){
+    public MinioClient minioClient() {
         return MinioClient.builder()
                 .endpoint(minioProperties.getUrl())
-                .credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey())
+                .credentials(
+                        minioProperties.getAccessKey(),
+                        minioProperties.getSecretKey())
                 .build();
     }
 
     /**
-     * Бин конфигурации Swagger
-     * @return
+     * Бин конфигурации Swagger.
+     *
+     * @return конфигурационный бин swagger.
      */
     @Bean
-    public OpenAPI openAPI(){
-        return new OpenAPI().addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-                .components(
-                        new Components()
-                                .addSecuritySchemes("bearerAuth", new SecurityScheme().type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer").bearerFormat("JWT"))
+    public OpenAPI openAPI() {
+        return new OpenAPI().addSecurityItem(
+                        new SecurityRequirement()
+                                .addList("bearerAuth"))
+                .components(new Components()
+                        .addSecuritySchemes(
+                                "bearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT"))
                 )
                 .info(new Info()
                         .title("Task list API")
@@ -100,43 +107,59 @@ public class ApplicationConfig {
 
     /**
      * Бин отвечающий за хэширование паролей при прохождении аутентификации.
-     * @return
+     *
+     * @return бин PasswordEncoder.
      */
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     /**
      * Бин отвечающий за аутентификацию пользователя.
+     *
      * @param configuration конфигурацию аутентификации.
      * @return менеджер аутентификации.
-     * @throws Exception исключение???
+     * @throws Exception любые исключения связан. с аутентиф.
      */
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            final AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
     /**
      * Бин с настройками фильтров Spring Security.
+     *
      * @param httpSecurity настройку Spring Security.
-     * @return
+     * @return фильтр безопасности.
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain filterChain(final HttpSecurity httpSecurity)
+            throws Exception {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(except -> except.authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    response.getWriter().write("Unauthorized.");
-                }).accessDeniedHandler((request, response, accessDeniedException) -> {
-                    response.setStatus(HttpStatus.FORBIDDEN.value());
-                    response.getWriter().write("Unauthorized.");
-                }))
+                .sessionManagement(sm -> sm
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(except -> except
+                        .authenticationEntryPoint(
+                                (request, response, authException) -> {
+                                    response.setStatus(
+                                            HttpStatus.UNAUTHORIZED.value());
+                                    response
+                                            .getWriter()
+                                            .write("Unauthorized.");
+                                })
+                        .accessDeniedHandler(
+                                (request, response, accessDeniedException) -> {
+                                    response.setStatus(
+                                            HttpStatus.FORBIDDEN.value());
+                                    response
+                                            .getWriter()
+                                            .write("Unauthorized.");
+                                }))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
@@ -144,8 +167,8 @@ public class ApplicationConfig {
                         .anyRequest().authenticated()
                 )
                 .anonymous(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new JwtTokenFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
-
+                .addFilterBefore(new JwtTokenFilter(tokenProvider),
+                        UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 

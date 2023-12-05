@@ -20,9 +20,17 @@ import java.util.Set;
  * Класс реализующий интерфейс UserService и содержащий бизнес-логику программы.
  * Осуществляет запросы к репозиторию и взаимодействующий с моделью User.
  */
-@Service  // Аннотация обозначающая класс как объект сервиса для Spring
-@RequiredArgsConstructor  // Аннотация lombok - используется для автоматической генерации конструктора, исходя из аргументов полей класса
-@Transactional(readOnly = true)  // Аннотация указывающая, что в классе производятся транзакции при обращении к БД
+// Аннотация обозначающая класс как объект сервиса для Spring
+@Service
+/*
+    Аннотация lombok - используется для
+    автоматической генерации конструктора,
+    исходя из аргументов полей класса
+ */
+@RequiredArgsConstructor
+// Аннотация указывающая,
+// что в классе производятся транзакции при обращении к БД
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     /**
      * Поле с репозиторием объекта User.
@@ -35,44 +43,54 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Получение пользователя по идентификатору.
+     *
      * @param id идентификатор пользователя.
-     * @throws ResourceNotFoundException пользователь не найден.
      * @return объект пользователя.
+     * @throws ResourceNotFoundException пользователь не найден.
      */
     @Override
-    @Cacheable(value = "UserService::getById", key = "#id")  // Добавляет данные в кеш
-    public User getById(long id) throws ResourceNotFoundException{
+    // Добавляет данные в кеш
+    @Cacheable(value = "UserService::getById", key = "#id")
+    public User getById(final long id) throws ResourceNotFoundException {
         return userRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found."));
     }
 
     /**
      * Получение пользователя по логину.
+     *
      * @param username логин пользователя.
-     * @throws ResourceNotFoundException пользователь не найден.
      * @return объект пользователя.
+     * @throws ResourceNotFoundException пользователь не найден.
      */
     @Override
-    @Cacheable(value = "UserService::getByUsername", key = "#username") // Добавляет данные в кеш
-    public User getByUsername(String username) throws ResourceNotFoundException{
+    // Добавляет данные в кеш
+    @Cacheable(value = "UserService::getByUsername", key = "#username")
+    public User getByUsername(
+            final String username) throws ResourceNotFoundException {
         return userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found."));
     }
 
     /**
-     * Обновление пользователя
+     * Обновление пользователя.
+     *
      * @param user объект пользователя.
      * @return обновленный объект пользователя.
      */
     @Override
     @Transactional
     @Caching(put = {  // Изменяет данные в кеше
-            @CachePut(value = "UserService::getById", key = "#user.id"),
-            @CachePut(value = "UserService::getByUsername", key = "#user.username")
+            @CachePut(value = "UserService::getById",
+                    key = "#user.id"),
+            @CachePut(value = "UserService::getByUsername",
+                    key = "#user.username")
     })
-    public User update(User user) {
+    public User update(final User user) {
         // Кодируем сырой пароль пользователя при сохранении в БД
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
@@ -81,24 +99,30 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Создание пользователя.
+     *
      * @param user объект пользователя.
-     * @throws IllegalArgumentException пользователь с таким логином существует, пароли не совпадают.
      * @return созданный объект пользователя.
+     * @throws IllegalArgumentException
+     * пользователь с таким логином существует, пароли не совпадают.
      */
     @Override
     @Transactional
     @Caching(cacheable = {  // Изменяет данные в кеше
-            @Cacheable(value = "UserService::getById", key = "#user.id"),
-            @Cacheable(value = "UserService::getByUsername", key = "#user.username")
+            @Cacheable(value = "UserService::getById",
+                    key = "#user.id"),
+            @Cacheable(value = "UserService::getByUsername",
+                    key = "#user.username")
     })
-    public User create(User user) {
+    public User create(final User user) {
         // Проверка, что пользователя с таким логином не существует.
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new IllegalStateException("User already exists");
         }
         // Проверка, что пароль и подтверждение пароля пользователя совпадают
-        if (!user.getPassword().equals(user.getPasswordConfirmation()))
-            throw new IllegalStateException("Password end password confirmation do not match.");
+        if (!user.getPassword().equals(user.getPasswordConfirmation())) {
+            throw new IllegalStateException(
+                    "Password end password confirmation do not match.");
+        }
         // Кодируем сырой пароль пользователя при сохранении в БД
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         //Задаем роль пользователя
@@ -110,23 +134,27 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Проверка, принадлежит ли задача пользователю.
+     *
      * @param userId идентификатор пользователя.
      * @param taskId идентификатор задачи.
      * @return true - если принадлежит, иначе false.
      */
     @Override
-    @Cacheable(value = "UserService::isTaskOwner", key = "#userId + '.' + #taskId") // Помещает данные в кеш
-    public boolean isTaskOwner(Long userId, long taskId) {
+    @Cacheable(value = "UserService::isTaskOwner",
+            key = "#userId + '.' + #taskId") // Помещает данные в кеш
+    public boolean isTaskOwner(final Long userId, final long taskId) {
         return userRepository.isTaskOwner(userId, taskId);
     }
 
     /**
      * Удаление пользователя.
+     *
      * @param id идентификатор пользователя.
      */
     @Override
-    @CacheEvict(value = "UserService::getById", key = "#id") // Удаляет данные из кеша
-    public void delete(long id) {
+    @CacheEvict(value = "UserService::getById",
+            key = "#id") // Удаляет данные из кеша
+    public void delete(final long id) {
         userRepository.deleteById(id);
     }
 }

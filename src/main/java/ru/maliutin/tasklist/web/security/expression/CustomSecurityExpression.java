@@ -11,7 +11,8 @@ import ru.maliutin.tasklist.web.security.JwtEntity;
 
 /**
  * Первый способ. Нужно создать этот класс и повесить аннотации в контреллерах.
- * Класс определяющий возможность пользователя доступа к данных сервиса (доступ к задачам)
+ * Класс определяющий возможность пользователя доступа
+ * к данных сервиса (доступ к задачам).
  */
 @Service("customSecurityExpression")
 @RequiredArgsConstructor
@@ -19,8 +20,9 @@ public class CustomSecurityExpression {
     // Поле объекта сервиса объектов User
     private final UserService userService;
 
-    public boolean canAccessUser(Long id){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public boolean canAccessUser(final Long id) {
+        Authentication authentication = SecurityContextHolder
+                .getContext().getAuthentication();
 
         JwtEntity user = (JwtEntity) authentication.getPrincipal();
 
@@ -30,23 +32,31 @@ public class CustomSecurityExpression {
     }
 
     /**
-     * Служебный метод проверки присутствия у объекта аутентификации переданных ролей.
+     * Служебный метод проверки присутствия
+     * у объекта аутентификации переданных ролей.
+     *
      * @param authentication объект аутентификации.
-     * @param roles коллекция ролей
-     * @return true - если какая-либо из ролей коллекции присутствует у объекта аутентификации, иначе false.
+     * @param roles          коллекция ролей
+     * @return true - если какая-либо из ролей коллекции
+     * присутствует у объекта аутентификации, иначе false.
      */
-    private boolean hasAnyRole(Authentication authentication, Role... roles){
-        for (Role role : roles){
-            SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.name());
-            if (authentication.getAuthorities().contains(authority)){
+    private boolean hasAnyRole(
+            final Authentication authentication, final Role... roles) {
+        for (Role role : roles) {
+            SimpleGrantedAuthority authority =
+                    new SimpleGrantedAuthority(role.name());
+            if (authentication
+                    .getAuthorities()
+                    .contains(authority)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean canAccessTask(long taskId){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public boolean canAccessTask(final long taskId) {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
         JwtEntity user = (JwtEntity) authentication.getPrincipal();
         Long userId = user.getId();

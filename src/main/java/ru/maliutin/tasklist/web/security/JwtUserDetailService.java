@@ -10,12 +10,16 @@ import ru.maliutin.tasklist.service.UserService;
 
 /**
  * Сервисный класс осуществляющий работу с UserService,
- * получающий пользователя из БД, и предающий Spring Security преобразованного полученного
+ * получающий пользователя из БД,
+ * и предающий Spring Security преобразованного полученного
  * пользователя для проведения аутентификации.
  */
 
-@Service  // Аннотация Spring - отмечающая класс, как сервисный.
-@RequiredArgsConstructor  // Аннотация lombok - предоставляющая конструктор в соответствии с полями класса.
+// Аннотация Spring - отмечающая класс, как сервисный.
+@Service
+// Аннотация lombok - предоставляющая конструктор
+// в соответствии с полями класса.
+@RequiredArgsConstructor
 public class JwtUserDetailService implements UserDetailsService {
     /**
      * Поле сервиса UserService для работы с БД.
@@ -28,12 +32,16 @@ public class JwtUserDetailService implements UserDetailsService {
      * пользователя по логину переданному в параметр метода.
      * Используя маппер преобразует полученный объект пользователя в тип
      * необходимый для Spring Security.
+     *
      * @param username логин пользователя.
      * @return преобразованный объект.
-     * @throws UsernameNotFoundException генерируется в случае отсутствия пользователя в БД.
+     * @throws UsernameNotFoundException генерируется
+     * в случае отсутствия пользователя в БД.
      */
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(
+            final String username)
+            throws UsernameNotFoundException {
         User user = userService.getByUsername(username);
         return JwtEntityFactory.create(user);
     }

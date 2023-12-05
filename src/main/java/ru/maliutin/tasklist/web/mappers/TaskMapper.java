@@ -4,12 +4,10 @@ import org.mapstruct.Mapper;
 import ru.maliutin.tasklist.domain.task.Task;
 import ru.maliutin.tasklist.web.dto.task.TaskDto;
 
-import java.util.List;
-
 /**
  * Интерфейс реализующий методы преобразования объектов Task.
  */
 @Mapper(componentModel = "spring")
-public interface TaskMapper extends Mappable<Task, TaskDto>{
+public interface TaskMapper extends Mappable<Task, TaskDto> {
 
 }

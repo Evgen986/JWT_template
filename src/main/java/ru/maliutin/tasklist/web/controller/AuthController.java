@@ -25,11 +25,17 @@ import ru.maliutin.tasklist.web.mappers.UserMapper;
 @RestController
 // Аннотация Spring - адрес обрабатываемый контроллером.
 @RequestMapping("/api/v1/auth")
-// Аннотация lombok - используется для автоматической генерации конструктора, исходя из аргументов полей класса, которые отмечены другой аннотацией Lombok, такой как @NonNull.
+/*
+    Аннотация lombok -
+    используется для автоматической генерации конструктора,
+    исходя из аргументов полей класса,
+    которые отмечены другой аннотацией Lombok, такой как @NonNull.
+ */
 @RequiredArgsConstructor
 // Аннотация Spring - активирует валидацию для всех методов контроллера.
 @Validated
-@Tag(name = "Auth Controller", description = "Auth API") // Аннотация Swagger добавляющая в документацию название и описание контроллера.
+@Tag(name = "Auth Controller", description = "Auth API")
+// Аннотация Swagger добавляющая в документацию название и описание контроллера.
 public class AuthController {
     /**
      * Поле сервиса аутентификации.
@@ -46,37 +52,45 @@ public class AuthController {
 
     /**
      * Аутентификация пользователя.
-     * @param loginRequest принимает запрос пользователя в виде jwt запроса (с токеном)
+     *
+     * @param loginRequest принимает запрос пользователя
+     *                     в виде jwt запроса (с токеном)
      * @return jwt ответ с парой токенов.
      */
     @PostMapping("/login")
-    @Operation(summary = "Authenticate user") // Аннотация Swagger добавляющая описание метода в документацию.
-    public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest){
+    // Аннотация Swagger добавляющая описание метода в документацию.
+    @Operation(summary = "Authenticate user")
+    public JwtResponse login(
+            @Validated @RequestBody final JwtRequest loginRequest) {
         return authService.login(loginRequest);
     }
 
     /**
      * Регистрация пользователя.
+     *
      * @param userDto объект передачи данных User
      * @return объект пользователя.
      */
     @PostMapping("/register")
-    @Operation(summary = "Registration user") // Аннотация Swagger добавляющая описание метода в документацию.
-    public UserDto register(@Validated(OnCreate.class) @RequestBody UserDto userDto){
+    // Аннотация Swagger добавляющая описание метода в документацию.
+    @Operation(summary = "Registration user")
+    public UserDto register(
+            @Validated(OnCreate.class) @RequestBody final UserDto userDto) {
         User user = userMapper.toEntity(userDto);
         User createdUser = userService.create(user);
         return userMapper.toDto(createdUser);
     }
 
     /**
-     * TODO
      * Метод обновления пары токенов.
-     * @param refreshToken токен для обновления
-     * @return
+     *
+     * @param refreshToken токен для обновления.
+     * @return обновленные токены.
      */
-    @Operation(summary = "Refresh token") // Аннотация Swagger добавляющая описание метода в документацию.
+    // Аннотация Swagger добавляющая описание метода в документацию.
+    @Operation(summary = "Refresh token")
     @PostMapping("/refresh")
-    public JwtResponse refresh(@RequestBody String refreshToken){
+    public JwtResponse refresh(@RequestBody final String refreshToken) {
         return authService.refresh(refreshToken);
     }
 }

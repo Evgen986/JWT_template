@@ -7,7 +7,8 @@ import java.util.Map;
 
 /**
  * Класс описывающий строение собственного исключения,
- * которое содержит информацию для фронта о сгенерированных исключениях на сервере.
+ * которое содержит информацию для фронта
+ * о сгенерированных исключениях на сервере.
  * (Единое, унифицированное исключение для пользователя)
  */
 @Data
@@ -18,7 +19,7 @@ public class ExceptionBody {
     // Коллекция полей классов и ошибок в этих полях при валидации.
     private Map<String, String> errors;
 
-    public ExceptionBody(String message) {
+    public ExceptionBody(final String message) {
         this.message = message;
     }
 }

@@ -14,9 +14,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Класс служащий макетом для преобразования объектов модели Task в TaskDTO и обратно.
+ * Класс служащий макетом
+ * для преобразования объектов модели
+ * Task в TaskDTO и обратно.
  */
-@Data  // Автоматически создает геттеры, сеттеры, конструкторы, hashcode, equals;
+// Автоматически создает геттеры,
+// сеттеры, конструкторы, hashcode, equals;
+@Data
 public class TaskDto {
     /**
      * Id задачи.
@@ -28,19 +32,26 @@ public class TaskDto {
         поэтому проверка проводится только для зарегистрированных задач,
         для их определения используется маркерный интерфейс OnUpdate.
      */
-    @NotNull(message = "id не может быть пустым!", groups = OnUpdate.class)  // Аннотация валидации - проверяющая, что поле не пустое.
+    @NotNull(message = "id не может быть пустым!",
+            groups = OnUpdate.class)
+    // Аннотация валидации - проверяющая, что поле не пустое.
     private long id;
     /**
      * Заголовок задачи.
      */
-    @NotNull(message = "Заголовок не может быть пустым!", groups = {OnUpdate.class, OnCreate.class})
+    @NotNull(message = "Заголовок не может быть пустым!",
+            groups = {OnUpdate.class, OnCreate.class})
     // Проверка длины получаемого строкового значения.
-    @Length(max = 255, message = "Заголовок не может быть длиннее 255 символов!", groups = {OnUpdate.class, OnCreate.class})
+    @Length(max = 255,
+            message = "Заголовок не может быть длиннее 255 символов!",
+            groups = {OnUpdate.class, OnCreate.class})
     private String title;
     /**
      * Описание задачи.
      */
-    @Length(max = 255, message = "Описание не может быть длиннее 255 символов!", groups = {OnUpdate.class, OnCreate.class})
+    @Length(max = 255,
+            message = "Описание не может быть длиннее 255 символов!",
+            groups = {OnUpdate.class, OnCreate.class})
     private String description;
     /**
      * Статус задачи (TODO, IN_PROGRESS, DONE).
@@ -50,7 +61,8 @@ public class TaskDto {
      * Время до которого должна быть выполнена задача.
      */
     /*
-        Аннотация позволяющая задать формат даты и времени при преобразовании объектов.
+        Аннотация позволяющая задать формат даты и времени
+        при преобразовании объектов.
         iso - указывает на определенный стандарт даты и времени.
      */
     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)

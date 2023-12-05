@@ -1,6 +1,19 @@
 package ru.maliutin.tasklist.domain.user;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Column;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Transient;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
 import lombok.Data;
 import ru.maliutin.tasklist.domain.task.Task;
 
@@ -14,7 +27,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "users")
-@Data  // Автоматически создает геттеры, сеттеры, конструкторы, hashcode, equals;
+// Автоматически создает геттеры, сеттеры, конструкторы, hashcode, equals;
+@Data
 public class User implements Serializable {
     /**
      * Id пользователя.
@@ -60,5 +74,4 @@ public class User implements Serializable {
     @OneToMany
     @JoinColumn(name = "task_id")
     private List<Task> tasks;
-
 }

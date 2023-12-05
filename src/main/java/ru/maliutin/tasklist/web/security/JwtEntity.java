@@ -11,7 +11,8 @@ import java.util.Collection;
  * Класс используемый Spring Security для аутентификации пользователя.
  */
 @Data
-@AllArgsConstructor  // Аннотация lombok - предоставляет классу конструктор со всеми полями.
+// Аннотация lombok - предоставляет классу конструктор со всеми полями.
+@AllArgsConstructor
 public class JwtEntity implements UserDetails {
     /**
      * Идентификатор пользователя.
@@ -32,10 +33,11 @@ public class JwtEntity implements UserDetails {
     /**
      * Коллекция ролей пользователя.
      */
-    private final Collection <? extends GrantedAuthority> authorities;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     /**
      * Возвращает коллекцию прав пользователя.
+     *
      * @return коллекция прав пользователя.
      */
     @Override
@@ -45,6 +47,7 @@ public class JwtEntity implements UserDetails {
 
     /**
      * Возвращает пароль пользователя.
+     *
      * @return пароль пользователя.
      */
     @Override
@@ -54,6 +57,7 @@ public class JwtEntity implements UserDetails {
 
     /**
      * Возвращает логин пользователя.
+     *
      * @return логин пользователя.
      */
     @Override
@@ -63,6 +67,7 @@ public class JwtEntity implements UserDetails {
 
     /**
      * Проверяет не просрочен ли аккаунт.
+     *
      * @return всегда возвращает true, в данном классе проверка опущена.
      */
     @Override
@@ -72,6 +77,7 @@ public class JwtEntity implements UserDetails {
 
     /**
      * Проверяет не заблокирован ли аккаунт.
+     *
      * @return всегда возвращает true, в данном классе проверка опущена.
      */
     @Override
@@ -81,6 +87,7 @@ public class JwtEntity implements UserDetails {
 
     /**
      * Проверяет не просрочен ли пароль.
+     *
      * @return всегда возвращает true, в данном классе проверка опущена.
      */
     @Override
@@ -90,6 +97,7 @@ public class JwtEntity implements UserDetails {
 
     /**
      * Проверяет, работает ли аккаунт.
+     *
      * @return всегда возвращает true, в данном классе проверка опущена.
      */
     @Override

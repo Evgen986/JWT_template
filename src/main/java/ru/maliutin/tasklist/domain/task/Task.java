@@ -1,6 +1,16 @@
 package ru.maliutin.tasklist.domain.task;
 
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Column;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,7 +22,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "tasks")
-@Data  // Автоматически создает геттеры, сеттеры, конструкторы, hashcode, equals;
+// Автоматически создает геттеры,
+// сеттеры, конструкторы, hashcode, equals;
+@Data
 public class Task implements Serializable {
     /**
      * Id задачи.
